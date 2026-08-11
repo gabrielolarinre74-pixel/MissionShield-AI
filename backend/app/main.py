@@ -16,7 +16,7 @@ from fastapi.responses import JSONResponse
 
 from app.config import settings
 from app.exceptions import DataSourceUnavailableError, MissionShieldError
-from app.routes import health, space_weather
+from app.routes import health, space_weather, mission, ai
 
 logging.basicConfig(
     level=logging.INFO,
@@ -81,6 +81,8 @@ def create_app() -> FastAPI:
     # Register routers.
     app.include_router(health.router, prefix="/api")
     app.include_router(space_weather.router, prefix="/api")
+    app.include_router(mission.router, prefix="/api")
+    app.include_router(ai.router, prefix="/api")
 
     return app
 

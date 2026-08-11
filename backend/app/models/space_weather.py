@@ -285,6 +285,11 @@ class SpaceWeatherSnapshot(BaseModel):
 
     Provenance metadata allows the frontend to truthfully display
     data freshness and source attribution.
+
+    Phase 2 extension: recent_*_series fields carry short time-series
+    for anomaly detection.  They are not exposed in the public API response
+    by default — they are used internally by the anomaly service.
+    The public API returns only the latest single-point readings.
     """
 
     model_config = ConfigDict(frozen=True)
@@ -314,3 +319,11 @@ class SpaceWeatherSnapshot(BaseModel):
     recent_cmes: list[CMEEvent] = Field(default_factory=list)
     recent_geomagnetic_storms: list[GeomagneticStormEvent] = Field(default_factory=list)
     recent_sep_events: list[SEPEvent] = Field(default_factory=list)
+
+    # --- Short time-series for anomaly detection (Phase 2) ---
+    # These carry the recent data window used by services/anomaly.py.
+    # They are not included in the public /snapshot API response.
+    recent_kp_series: list[KpReading] = Field(default_factory=list, exclude=True)
+    recent_solar_wind_series: list[SolarWindReading] = Field(default_factory=list, exclude=True)
+    recent_mag_field_series: list[MagneticFieldReading] = Field(default_factory=list, exclude=True)
+    recent_proton_flux_series: list[ProtonFluxReading] = Field(default_factory=list, exclude=True)

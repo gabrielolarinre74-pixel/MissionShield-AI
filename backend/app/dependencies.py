@@ -22,3 +22,9 @@ def get_cache() -> TTLCache:
 def get_space_weather_service() -> SpaceWeatherService:
     """Return a SpaceWeatherService backed by the shared cache."""
     return SpaceWeatherService(cache=get_cache())
+
+
+def get_watsonx_client():
+    """Return the WatsonxClient singleton (lazy-initialized on first use)."""
+    from app.ai.watsonx_client import get_watsonx_client as _get
+    return _get()

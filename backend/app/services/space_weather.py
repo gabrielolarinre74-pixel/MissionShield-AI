@@ -189,6 +189,9 @@ class SpaceWeatherService:
         if proton_data:
             latest_proton = _latest_proton_10mev(proton_data)
 
+        # Keep the last 120 readings for anomaly detection (~2 hours of 1-min data).
+        _MAX_SERIES = 120
+
         return SpaceWeatherSnapshot(
             fetched_at=now,
             freshness=DataFreshness.LIVE,
@@ -202,6 +205,11 @@ class SpaceWeatherService:
             recent_cmes=cmes_data or [],
             recent_geomagnetic_storms=storms_data or [],
             recent_sep_events=seps_data or [],
+            # Time-series for anomaly detection (excluded from public API response).
+            recent_kp_series=(kp_data or [])[-_MAX_SERIES:],
+            recent_solar_wind_series=(wind_data or [])[-_MAX_SERIES:],
+            recent_mag_field_series=(mag_data or [])[-_MAX_SERIES:],
+            recent_proton_flux_series=(proton_data or [])[-_MAX_SERIES:],
         )
 
     @staticmethod

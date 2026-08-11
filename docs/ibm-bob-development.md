@@ -114,10 +114,92 @@ All three endpoints tested via `backend/endpoint_test.py` using the FastAPI ASGI
 
 ---
 
+## Phase 2 — Mission Risk Intelligence + Anomaly Detection + IBM Granite
+
+**Tool:** IBM Bob Agent Mode
+
+### What was built
+
+All Phase 2 code was written by IBM Bob Agent Mode in a single implementation session.
+
+**Risk engine:**
+- `backend/app/services/risk_policy.py` — Centralised weight matrix, NOAA G/S/R reference
+  thresholds, CME watch heuristic, risk level bands.  All weights validated to sum to 1.0.
+- `backend/app/services/risk_engine.py` — Pure deterministic scoring function.
+  Four primary factors (Geomagnetic/GEO, Solar Radiation/RAD, Solar Flare/FLARE,
+  Earth-directed CME Watch/CME) with piecewise severity functions anchored to NOAA
+  G/S/R scale boundaries.  Missing-data renormalization, data_completeness,
+  confidence indicator, simulation override support.
+
+**Model updates:**
+- `backend/app/models/risk.py` — Expanded `RiskFactor` (normalized_severity,
+  mission_weight, weighted_contribution, observed_value, units, source, explanation,
+  reference_scale, data_available) and `MissionRiskReport` (data_completeness,
+  missing_factors, confidence).
+- `backend/app/models/space_weather.py` — Added `recent_*_series` time-series fields
+  to `SpaceWeatherSnapshot` for anomaly detection (excluded from public API).
+
+**Anomaly detection:**
+- `backend/app/services/anomaly.py` — Robust z-score (median/MAD) anomaly detection
+  for Kp, solar wind speed, IMF Bz, ≥10 MeV proton flux.  MAD=0 fallback handles
+  constant series.  Minimum sample count enforced.  Clearly separated from hazard score.
+
+**IBM Granite AI service:**
+- `backend/app/ai/__init__.py` — Package initializer.
+- `backend/app/ai/watsonx_client.py` — WatsonxClient wrapping `ibm_watsonx_ai`
+  `Credentials` + `ModelInference`.  Lazy initialization.  Credentials never logged.
+- `backend/app/ai/prompts.py` — System and user prompt templates.  Constraints
+  explicitly instruct Granite not to invent measurements, not to claim NASA/NOAA
+  endorsement, and to distinguish simulated from observed data.
+- `backend/app/ai/mission_ai.py` — `generate_brief()` and `answer_question()`.
+  Context serialization (no credentials in context).  Brief cache (5-min TTL).
+  Chat history bounded to last 8 messages.  AI failures raise `AIServiceError`.
+
+**API routes:**
+- `backend/app/routes/mission.py` — `POST /api/mission/risk`
+- `backend/app/routes/ai.py` — `POST /api/ai/brief`, `POST /api/ai/chat`
+- `backend/app/routes/space_weather.py` — Added `GET /api/space-weather/anomalies`
+- `backend/app/main.py` — Registered new routers.
+- `backend/app/dependencies.py` — Added `get_watsonx_client()` dependency.
+
+**Services extension:**
+- `backend/app/services/space_weather.py` — Extended `_fetch_live()` to retain
+  time-series windows for anomaly detection.
+
+**Documentation:**
+- `docs/risk-methodology.md` — Full methodology documentation including NOAA
+  official reference mappings, prototype disclaimers, weight matrix, CME heuristic,
+  anomaly method.
+
+### Tests (196 total, all passing)
+
+Phase 2 added:
+- `backend/tests/test_risk_engine.py` — 74 tests.
+  NOAA G/S/R scale boundaries, all four profiles, weight sums, score bounds,
+  risk level bands, primary factor determinism, missing data, degraded confidence,
+  simulation override, snapshot immutability.
+- `backend/tests/test_anomaly.py` — 27 tests.
+  Normal/outlier/insufficient/MAD=0/null cases for all four parameters.
+- `backend/tests/test_granite.py` — 22 tests (all mocked — no live API calls).
+  Context serialization, credential security, brief caching, history bounding,
+  AI error handling, prompt content verification.
+- `backend/tests/test_phase2_endpoints.py` — 22 tests.
+  All new routes, simulation, graceful AI failure, credential non-exposure,
+  Phase 1 regression.
+
+Phase 1's 24 tests continue passing (196 total across both phases).
+
+### Live Granite sanity check
+
+One live IBM Granite sanity check was performed via `backend/sanity_check_phase2.py`
+to verify the Phase 2 Mission AI service works end-to-end with real credentials.
+See that file for the result at time of Phase 2 completion.
+
+---
+
 ## Upcoming Phases
 
-- **Phase 2** — Risk engine (weighted scoring per mission profile) + anomaly detection
-- **Phase 3** — IBM Granite AI service (mission brief + contextual Q&A)
+- **Phase 3** — API surface completion and Phase 2/3 integration verification
 - **Phase 4** — Next.js frontend (design system → dashboard → Mission AI panel → simulation)
 - **Phase 5** — Deployment (Railway backend, Vercel frontend)
 - **Phase 6** — Documentation and final polish

@@ -15,6 +15,7 @@ from fastapi import APIRouter, Depends, HTTPException, Response
 from app.dependencies import get_space_weather_service
 from app.exceptions import DataSourceUnavailableError, PartialDataError
 from app.models.space_weather import SpaceWeatherSnapshot
+from app.services.anomaly import AnomalyFlag, detect_snapshot_anomalies
 from app.services.space_weather import SpaceWeatherService
 
 logger = logging.getLogger(__name__)
@@ -99,3 +100,41 @@ async def get_events(
         "geomagnetic_storms": [g.model_dump(mode="json") for g in snapshot.recent_geomagnetic_storms],
         "sep_events": [s.model_dump(mode="json") for s in snapshot.recent_sep_events],
     }
+
+
+@router.get("/anomalies", response_model=list[AnomalyFlag])
+async def get_anomalies(
+    response: Response,
+    svc: Annotated[SpaceWeatherService, Depends(get_space_weather_service)],
+) -> list[AnomalyFlag]:
+    """
+    Return statistical anomaly detection results for the current space-weather snapshot.
+
+    Uses the robust z-score method on available time-series data.
+    An empty list means either no anomalies were detected or insufficient
+    time-series data is available (e.g. fresh cache or first fetch).
+
+    Note: statistical anomaly flags are situational awareness — they are
+    separate from the mission risk score and do not imply danger.
+    """
+    try:
+        snapshot = await svc.get_snapshot()
+    except DataSourceUnavailableError as exc:
+        raise HTTPException(
+            status_code=503,
+            detail={
+                "error": "DATA_SOURCE_UNAVAILABLE",
+                "message": "Space-weather data unavailable.",
+                "source": exc.source,
+            },
+        ) from exc
+    except Exception as exc:
+        logger.error("Anomaly endpoint error: %s", exc, exc_info=True)
+        raise HTTPException(
+            status_code=500,
+            detail={"error": "INTERNAL_ERROR", "message": "An internal error occurred."},
+        ) from exc
+
+    response.headers["X-Data-Freshness"] = snapshot.freshness.value
+    flags = detect_snapshot_anomalies(snapshot)
+    return flags
