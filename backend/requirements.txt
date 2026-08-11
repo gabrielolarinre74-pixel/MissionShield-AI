@@ -1,0 +1,9 @@
+fastapi>=0.115
+uvicorn[standard]>=0.35
+pydantic>=2.0
+pydantic-settings>=2.0
+python-dotenv>=1.0
+httpx>=0.28
+pytest>=8.0
+pytest-asyncio>=0.25
+anyio>=4.0

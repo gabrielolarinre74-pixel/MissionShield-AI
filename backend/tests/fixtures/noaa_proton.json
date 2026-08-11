@@ -1,0 +1,11 @@
+[
+  {"time_tag": "2026-08-11T07:30:00Z", "satellite": 18, "flux": 0.7693033814430237, "energy": ">=1 MeV"},
+  {"time_tag": "2026-08-11T07:30:00Z", "satellite": 18, "flux": 0.23489998281002045, "energy": ">=10 MeV"},
+  {"time_tag": "2026-08-11T07:30:00Z", "satellite": 18, "flux": 0.20667439699172974, "energy": ">=100 MeV"},
+  {"time_tag": "2026-08-11T07:30:00Z", "satellite": 18, "flux": 0.2279500663280487, "energy": ">=30 MeV"},
+  {"time_tag": "2026-08-11T07:30:00Z", "satellite": 18, "flux": 0.23897713422775269, "energy": ">=5 MeV"},
+  {"time_tag": "2026-08-11T07:35:00Z", "satellite": 18, "flux": 0.9317041039466858, "energy": ">=1 MeV"},
+  {"time_tag": "2026-08-11T07:35:00Z", "satellite": 18, "flux": 0.2374527007341385, "energy": ">=10 MeV"},
+  {"time_tag": "2026-08-11T07:35:00Z", "satellite": 18, "flux": 0.20605400204658508, "energy": ">=100 MeV"},
+  {"time_tag": "2026-08-11T07:35:00Z", "satellite": 18, "flux": null, "energy": ">=30 MeV"}
+]

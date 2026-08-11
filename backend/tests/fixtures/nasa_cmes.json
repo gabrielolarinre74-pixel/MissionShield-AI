@@ -1,0 +1,90 @@
+[
+  {
+    "activityID": "2026-08-04T11:23:00-CME-001",
+    "catalog": "M2M_CATALOG",
+    "startTime": "2026-08-04T11:23Z",
+    "instruments": [{"displayName": "STEREO A: SECCHI/COR2"}, {"displayName": "GOES: CCOR-1"}],
+    "sourceLocation": "",
+    "activeRegionNum": null,
+    "note": "CME first seen to the SE in STEREO A COR2.",
+    "submissionTime": "2026-08-04T16:44Z",
+    "versionId": 1,
+    "link": "https://webtools.ccmc.gsfc.nasa.gov/DONKI/view/CME/47952/-1",
+    "cmeAnalyses": [
+      {
+        "isMostAccurate": true,
+        "time21_5": "2026-08-04T19:05Z",
+        "latitude": -31.0,
+        "longitude": -17.0,
+        "halfAngle": 18.0,
+        "speed": 527.0,
+        "type": "C",
+        "featureCode": "LE",
+        "imageType": "running difference",
+        "measurementTechnique": "SWPC_CAT",
+        "note": "Measurement based on best fit.",
+        "levelOfData": 0,
+        "tilt": null,
+        "minorHalfWidth": null,
+        "speedMeasuredAtHeight": 12.4,
+        "submissionTime": "2026-08-04T16:45Z",
+        "link": "https://webtools.ccmc.gsfc.nasa.gov/DONKI/view/CMEAnalysis/47953/-1",
+        "enlilList": [
+          {
+            "modelCompletionTime": "2026-08-04T16:59Z",
+            "au": 2.0,
+            "estimatedShockArrivalTime": "2026-08-08T12:00Z",
+            "estimatedDuration": null,
+            "rmin_re": null,
+            "kp_18": null,
+            "kp_90": 2,
+            "kp_135": 3,
+            "kp_180": 3,
+            "isEarthGB": true,
+            "isEarthMinorImpact": false,
+            "link": "https://webtools.ccmc.gsfc.nasa.gov/DONKI/view/WSA-ENLIL/47954/-1",
+            "impactList": []
+          }
+        ]
+      }
+    ],
+    "linkedEvents": null,
+    "sentNotifications": null
+  },
+  {
+    "activityID": "2026-08-04T10:09:00-CME-001",
+    "catalog": "M2M_CATALOG",
+    "startTime": "2026-08-04T10:09Z",
+    "instruments": [{"displayName": "STEREO A: SECCHI/COR2"}],
+    "sourceLocation": "",
+    "activeRegionNum": null,
+    "note": "CME visible to the NE in STEREO A COR2 imagery.",
+    "submissionTime": "2026-08-04T12:57Z",
+    "versionId": 1,
+    "link": "https://webtools.ccmc.gsfc.nasa.gov/DONKI/view/CME/47947/-1",
+    "cmeAnalyses": [
+      {
+        "isMostAccurate": true,
+        "time21_5": "2026-08-04T21:25Z",
+        "latitude": 54.0,
+        "longitude": null,
+        "halfAngle": 32.0,
+        "speed": 298.0,
+        "type": "S",
+        "featureCode": "LE",
+        "imageType": "running difference",
+        "measurementTechnique": "Plane-of-sky",
+        "note": "Plane of sky measurement.",
+        "levelOfData": 0,
+        "tilt": null,
+        "minorHalfWidth": null,
+        "speedMeasuredAtHeight": 7.0,
+        "submissionTime": "2026-08-04T12:58Z",
+        "link": "https://webtools.ccmc.gsfc.nasa.gov/DONKI/view/CMEAnalysis/47948/-1",
+        "enlilList": []
+      }
+    ],
+    "linkedEvents": null,
+    "sentNotifications": null
+  }
+]

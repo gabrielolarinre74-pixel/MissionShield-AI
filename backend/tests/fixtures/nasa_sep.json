@@ -1,0 +1,25 @@
+[
+  {
+    "sepID": "2026-07-30T18:45:00-SEP-001",
+    "eventTime": "2026-07-30T18:45Z",
+    "instruments": [{"displayName": "GOES-P: SEISS >10 MeV"}],
+    "submissionTime": "2026-07-31T16:14Z",
+    "versionId": 2,
+    "link": "https://webtools.ccmc.gsfc.nasa.gov/DONKI/view/SEP/47879/-1",
+    "linkedEvents": [
+      {"activityID": "2026-07-30T15:53:00-FLR-001"},
+      {"activityID": "2026-07-30T16:53:00-CME-001"}
+    ],
+    "sentNotifications": null
+  },
+  {
+    "sepID": "2026-07-30T18:20:00-SEP-001",
+    "eventTime": "2026-07-30T18:20Z",
+    "instruments": [{"displayName": "MODEL: REleASE:ACE/EPAM 15.8-39.8 MeV"}],
+    "submissionTime": "2026-07-30T18:09Z",
+    "versionId": 1,
+    "link": "https://webtools.ccmc.gsfc.nasa.gov/DONKI/view/SEP/47868/-1",
+    "linkedEvents": null,
+    "sentNotifications": null
+  }
+]
