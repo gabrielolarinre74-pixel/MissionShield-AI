@@ -32,6 +32,7 @@ import { useSpaceWeather } from '@/hooks/useSpaceWeather';
 import { useMissionRisk } from '@/hooks/useMissionRisk';
 import { useMissionAI } from '@/hooks/useMissionAI';
 import { useSimulation } from '@/hooks/useSimulation';
+import { useTheme } from '@/hooks/useTheme';
 
 // Lib
 import type { MissionProfile } from '@/types';
@@ -64,11 +65,17 @@ export default function MissionShieldApp() {
   const [section, setSection] = useState<SectionId>('overview');
   const [aiPanelOpen, setAiPanelOpen] = useState(true);
   const [navCollapsed, setNavCollapsed] = useState(false);
+  // True once session-storage hydration has applied the stored profile/section.
+  // The Mission Brief auto-load waits for this so it never fetches a brief for
+  // the pre-hydration default profile (which would be tagged with the wrong
+  // profile and hidden, leaving the brief area empty).
+  const [hydrated, setHydrated] = useState(false);
 
   // Hydrate from session storage after mount (avoids SSR mismatch)
   useEffect(() => {
     setProfile(readStoredProfile());
     setSection(readStoredSection());
+    setHydrated(true);
   }, []);
 
   // Simulation
@@ -95,6 +102,9 @@ export default function MissionShieldApp() {
     clearChat,
   } = useMissionAI();
 
+  // Theme (light/dark) — persisted in localStorage
+  const { theme, toggleTheme } = useTheme();
+
   // Handle profile change — cancel in-flight brief, clear stale brief + chat immediately.
   const handleProfileChange = useCallback(
     (newProfile: MissionProfile) => {
@@ -115,7 +125,9 @@ export default function MissionShieldApp() {
   // Auto-load brief once when: profile changes (brief is now idle) AND we are on
   // overview or the AI panel is open.  Simulation overrides do NOT trigger auto-load —
   // the user must explicitly request a simulated brief via the "Generate" button.
+  // Waits for session-storage hydration so the brief always matches the stored profile.
   useEffect(() => {
+    if (!hydrated) return;
     if ((section === 'overview' || aiPanelOpen) && briefState === 'idle') {
       // Only load a live-mode brief automatically (no overrides).
       // Simulated briefs are always user-initiated.
@@ -124,7 +136,7 @@ export default function MissionShieldApp() {
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [profile, section, aiPanelOpen]);
+  }, [profile, section, aiPanelOpen, hydrated]);
 
   const isLoading = swState === 'loading';
 
@@ -249,6 +261,8 @@ export default function MissionShieldApp() {
           loading={isLoading}
           isSimulated={isSimulated}
           aiPanelOpen={aiPanelOpen}
+          theme={theme}
+          onToggleTheme={toggleTheme}
           onToggleAiPanel={() => setAiPanelOpen((v) => !v)}
           onRefresh={refreshSnapshot}
         />

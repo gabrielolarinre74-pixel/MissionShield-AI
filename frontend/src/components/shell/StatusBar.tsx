@@ -1,9 +1,10 @@
 'use client';
 
-import { RefreshCw, PanelRightOpen, PanelRightClose } from 'lucide-react';
+import { RefreshCw, PanelRightOpen, PanelRightClose, Sun, Moon } from 'lucide-react';
 import { FreshnessBadge } from '@/components/ui/FreshnessBadge';
 import { SimBadge } from '@/components/ui/SimBadge';
 import type { SpaceWeatherSnapshot } from '@/types';
+import type { ThemeMode } from '@/hooks/useTheme';
 import { formatUtcShort } from '@/lib/formatters';
 
 interface StatusBarProps {
@@ -11,6 +12,8 @@ interface StatusBarProps {
   loading: boolean;
   isSimulated: boolean;
   aiPanelOpen: boolean;
+  theme: ThemeMode;
+  onToggleTheme: () => void;
   onToggleAiPanel: () => void;
   onRefresh: () => void;
 }
@@ -20,6 +23,8 @@ export function StatusBar({
   loading,
   isSimulated,
   aiPanelOpen,
+  theme,
+  onToggleTheme,
   onToggleAiPanel,
   onRefresh,
 }: StatusBarProps) {
@@ -119,6 +124,40 @@ export function StatusBar({
 
       {/* Spacer */}
       <div style={{ flex: 1 }} />
+
+      {/* Theme toggle */}
+      <button
+        onClick={onToggleTheme}
+        aria-label={theme === 'dark' ? 'Switch to light theme' : 'Switch to dark theme'}
+        title={theme === 'dark' ? 'Switch to light theme' : 'Switch to dark theme'}
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          width: 28,
+          height: 28,
+          color: 'var(--text-muted)',
+          background: 'none',
+          border: 'none',
+          cursor: 'pointer',
+          borderRadius: 4,
+          transition: 'color 150ms ease, background-color 150ms ease',
+        }}
+        onMouseEnter={(e) => {
+          e.currentTarget.style.color = 'var(--accent-hover)';
+          e.currentTarget.style.background = 'var(--accent-dim)';
+        }}
+        onMouseLeave={(e) => {
+          e.currentTarget.style.color = 'var(--text-muted)';
+          e.currentTarget.style.background = 'none';
+        }}
+      >
+        {theme === 'dark' ? (
+          <Sun size={14} aria-hidden="true" />
+        ) : (
+          <Moon size={14} aria-hidden="true" />
+        )}
+      </button>
 
       {/* Refresh */}
       <button

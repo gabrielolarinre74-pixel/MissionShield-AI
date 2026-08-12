@@ -63,7 +63,7 @@ function FactorBar({ severity, weight }: { severity: number; weight: number }) {
           top: 0,
           height: '100%',
           width: `${Math.round(weight * 100)}%`,
-          border: `1px solid rgba(255,255,255,0.1)`,
+          border: `1px solid var(--border-medium)`,
           borderRadius: 2,
           pointerEvents: 'none',
         }}

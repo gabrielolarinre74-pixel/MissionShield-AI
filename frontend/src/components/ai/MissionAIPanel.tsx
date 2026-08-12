@@ -103,9 +103,9 @@ function BriefContent({ brief, isSimulated }: { brief: BriefResponse; isSimulate
               {section.label && (
                 <p
                   style={{
-                    fontSize: 9,
+                    fontSize: 10,
                     fontWeight: 600,
-                    letterSpacing: '0.1em',
+                    letterSpacing: '0.09em',
                     textTransform: 'uppercase',
                     color: 'var(--text-muted)',
                     marginBottom: 3,
@@ -116,9 +116,9 @@ function BriefContent({ brief, isSimulated }: { brief: BriefResponse; isSimulate
               )}
               <div
                 style={{
-                  fontSize: 12,
+                  fontSize: 12.5,
                   color: 'var(--text-secondary)',
-                  lineHeight: 1.6,
+                  lineHeight: 1.65,
                 }}
               >
                 {section.lines
