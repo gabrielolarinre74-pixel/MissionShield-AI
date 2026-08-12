@@ -285,7 +285,13 @@ cd frontend && npm run lint && npm run build
 
 ## Deployment
 
-Production deployment is part of the next delivery phase.
+MissionShield AI is live in production:
+
+- **Frontend:** https://missionshield-ai-frontend.vercel.app
+- **Backend API:** https://backend-production-48c9.up.railway.app
+- **Health endpoint:** https://backend-production-48c9.up.railway.app/api/health
+
+The backend runs on **Railway** (FastAPI + Uvicorn on Railway's assigned port, service root `/backend`) and the frontend runs on **Vercel** (Next.js, root directory `frontend`). The frontend calls the backend via `NEXT_PUBLIC_API_URL`, and the backend's CORS `FRONTEND_ORIGIN` is locked to the exact Vercel production origin — no wildcard CORS.
 
 ## Disclaimer
 
