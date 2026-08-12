@@ -2,6 +2,8 @@
 
 import { useState, useRef, useEffect } from 'react';
 import { Send, RefreshCw, X, Cpu, FlaskConical } from 'lucide-react';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 import { SimBadge } from '@/components/ui/SimBadge';
 import { SkeletonText } from '@/components/ui/Skeleton';
 import { ErrorState } from '@/components/ui/ErrorState';
@@ -517,7 +519,120 @@ export function MissionAIPanel({
                 wordBreak: 'break-word',
               }}
             >
-              {msg.content}
+              {msg.role === 'assistant' ? (
+  <div style={{ overflowX: 'auto' }}>
+    <ReactMarkdown
+      remarkPlugins={[remarkGfm]}
+      components={{
+        p: ({ children }) => (
+          <p
+            style={{
+              margin: '0 0 10px',
+              lineHeight: 1.65,
+            }}
+          >
+            {children}
+          </p>
+        ),
+        strong: ({ children }) => (
+          <strong
+            style={{
+              color: 'var(--text-primary)',
+              fontWeight: 600,
+            }}
+          >
+            {children}
+          </strong>
+        ),
+        ul: ({ children }) => (
+          <ul
+            style={{
+              margin: '6px 0 12px',
+              paddingLeft: 20,
+            }}
+          >
+            {children}
+          </ul>
+        ),
+        ol: ({ children }) => (
+          <ol
+            style={{
+              margin: '6px 0 12px',
+              paddingLeft: 20,
+            }}
+          >
+            {children}
+          </ol>
+        ),
+        li: ({ children }) => (
+          <li
+            style={{
+              marginBottom: 5,
+              lineHeight: 1.6,
+            }}
+          >
+            {children}
+          </li>
+        ),
+        table: ({ children }) => (
+          <table
+            style={{
+              width: '100%',
+              borderCollapse: 'collapse',
+              margin: '10px 0 14px',
+              fontSize: 12,
+            }}
+          >
+            {children}
+          </table>
+        ),
+        th: ({ children }) => (
+          <th
+            style={{
+              textAlign: 'left',
+              padding: '8px 10px',
+              borderBottom: '1px solid var(--border-strong)',
+              color: 'var(--text-primary)',
+              fontWeight: 600,
+              background: 'var(--surface-3)',
+            }}
+          >
+            {children}
+          </th>
+        ),
+        td: ({ children }) => (
+          <td
+            style={{
+              padding: '8px 10px',
+              borderBottom: '1px solid var(--border-subtle)',
+              verticalAlign: 'top',
+            }}
+          >
+            {children}
+          </td>
+        ),
+        code: ({ children }) => (
+          <code
+            style={{
+              fontFamily: 'var(--font-mono)',
+              fontSize: '0.92em',
+              padding: '2px 5px',
+              borderRadius: 4,
+              background: 'var(--surface-3)',
+              color: 'var(--text-primary)',
+            }}
+          >
+            {children}
+          </code>
+        ),
+      }}
+    >
+      {msg.content}
+    </ReactMarkdown>
+  </div>
+) : (
+  <span>{msg.content}</span>
+)}
             </div>
           </div>
         ))}
