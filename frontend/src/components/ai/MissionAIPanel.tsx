@@ -281,10 +281,22 @@ export function MissionAIPanel({
         </button>
       </div>
 
+      {/* Scrollable content region: Mission Brief + conversation + suggestions.
+          flex: 1 + min-height: 0 keeps this the only scrolling area, so the
+          header and composer below are never pushed out or covered. */}
+      <div
+        style={{
+          flex: 1,
+          minHeight: 0,
+          overflowY: 'auto',
+          display: 'flex',
+          flexDirection: 'column',
+        }}
+      >
       {/* Mission Brief */}
       <div
         style={{
-          padding: '14px 16px',
+          padding: '14px 16px 16px',
           borderBottom: '1px solid var(--border-subtle)',
           flexShrink: 0,
         }}
@@ -423,15 +435,14 @@ export function MissionAIPanel({
         )}
       </div>
 
-      {/* Chat area */}
+      {/* Conversation */}
       <div
         role="log"
         aria-label="Mission AI conversation"
         aria-live="polite"
         style={{
-          flex: 1,
-          overflowY: 'auto',
-          padding: '12px 16px',
+          flexShrink: 0,
+          padding: '12px 16px 18px',
           display: 'flex',
           flexDirection: 'column',
           gap: 12,
@@ -502,7 +513,7 @@ export function MissionAIPanel({
                 borderRadius: 8,
                 fontSize: 13,
                 color: 'var(--text-secondary)',
-                lineHeight: 1.55,
+                lineHeight: 1.6,
                 wordBreak: 'break-word',
               }}
             >
@@ -539,6 +550,7 @@ export function MissionAIPanel({
 
         <div ref={messagesEndRef} />
       </div>
+      </div>
 
       {/* Clear chat */}
       {messages.length > 0 && (
@@ -547,6 +559,7 @@ export function MissionAIPanel({
             padding: '0 16px 4px',
             display: 'flex',
             justifyContent: 'flex-end',
+            flexShrink: 0,
           }}
         >
           <button
@@ -632,7 +645,7 @@ export function MissionAIPanel({
           <Send size={14} aria-hidden="true" />
         </button>
       </div>
-      <p style={{ fontSize: 10, color: 'var(--text-muted)', padding: '0 12px 8px', textAlign: 'center' }}>
+      <p style={{ fontSize: 10, color: 'var(--text-muted)', padding: '0 12px 8px', textAlign: 'center', flexShrink: 0 }}>
         Enter to send · Shift+Enter for new line
       </p>
     </aside>

@@ -1,5 +1,3 @@
-@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap');
-
 @import "tailwindcss";
 
 :root {
@@ -49,9 +47,9 @@
   --cached-color: #6EA8FE;
   --stale-color: #F97316;
 
-  /* Typography */
-  --font-sans: 'IBM Plex Sans', system-ui, -apple-system, sans-serif;
-  --font-mono: 'IBM Plex Mono', 'Courier New', monospace;
+  /* Typography — font families are loaded and self-hosted via next/font in layout.tsx */
+  --font-sans: var(--font-manrope), system-ui, -apple-system, sans-serif;
+  --font-mono: var(--font-plex-mono), 'Courier New', monospace;
 }
 
 * {
