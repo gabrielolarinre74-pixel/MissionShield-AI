@@ -575,17 +575,18 @@ export function MissionAIPanel({
           </li>
         ),
         table: ({ children }) => (
-          <table
-            style={{
-              width: '100%',
-              borderCollapse: 'collapse',
-              margin: '10px 0 14px',
-              fontSize: 12,
-            }}
-          >
-            {children}
-          </table>
-        ),
+  <table
+    style={{
+      width: '100%',
+      minWidth: 520,
+      borderCollapse: 'collapse',
+      margin: '10px 0 14px',
+      fontSize: 12,
+    }}
+  >
+    {children}
+  </table>
+),
         th: ({ children }) => (
           <th
             style={{

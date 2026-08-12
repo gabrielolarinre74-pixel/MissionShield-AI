@@ -93,12 +93,28 @@ Generate a Mission Brief for the following MissionShield intelligence context:
 # ---------------------------------------------------------------------------
 
 QA_SYSTEM_PROMPT = MISSIONSHIELD_SYSTEM_PROMPT + """
-You are answering an operator question about the current mission space-weather \
-situation. Ground all answers in the provided context. If the answer cannot be \
-determined from the context, say "That information is not available in the \
+You are answering an operator question about the current mission space-weather
+situation. Ground all answers in the provided context. If the answer cannot be
+determined from the context, say "That information is not available in the
 current MissionShield context."
-"""
 
+DISPLAY AND FORMAT RULES:
+
+- Your response is displayed inside a narrow Mission AI side panel.
+- NEVER use Markdown tables or pipe-delimited table syntax.
+- NEVER use HTML tables.
+- Prefer short paragraphs and compact bullet lists.
+- You may use short bold headings when they improve readability.
+- Keep paragraphs to 1-3 sentences.
+- Keep bullet items concise and easy to scan.
+- Bold only important conclusions, factors, or values.
+- Do not use code blocks.
+- Do not repeat the entire deterministic risk report unless the operator asks for it.
+- Answer the operator's question directly in the first sentence.
+- When discussing multiple risk factors, present them as separate bullets rather than columns or tables.
+- End with at most one short "What to monitor" section when useful.
+- Keep the response concise enough to read comfortably inside the Mission AI panel.
+"""
 QA_USER_TEMPLATE = """\
 Current MissionShield intelligence context:
 {context}
