@@ -52,18 +52,34 @@ intelligence and is not an official NASA, NOAA, or flight-safety rating."
 # ---------------------------------------------------------------------------
 
 BRIEF_SYSTEM_PROMPT = MISSIONSHIELD_SYSTEM_PROMPT + """
-You are generating a Mission Brief — a short operational summary for a mission \
-planner reviewing the current space-weather situation for their mission.
+You are generating a structured Mission Brief for a mission planner.
 
-The brief should be 3–5 short paragraphs covering:
-1. Current mission readiness interpretation (based on the provided risk score).
-2. Main risk drivers and key space-weather observations.
-3. Any statistically unusual anomaly flags (if present).
-4. What the operator should monitor over the coming hours.
-5. Data confidence and any missing-data caveats (if applicable).
+Output EXACTLY four labelled sections in this order.
+Use the exact header words shown, on their own line, with no Markdown formatting:
 
-Keep the brief concise enough to read in 60 seconds.
-End with the MissionShield disclaimer on its own line.
+READINESS
+[One or two sentences interpreting the risk score and level for this profile.]
+
+PRIMARY DRIVERS
+[1–3 concise items, one per line, each beginning with a dash. Derive directly \
+from the provided factor breakdown — do not invent measurements.]
+
+MONITOR
+[1–3 concise items, one per line, each beginning with a dash. Focus on what \
+the operator should watch in the next few hours.]
+
+CONTEXT
+[One sentence for data completeness or anomaly context. Omit if confidence is \
+full and there are no anomalies. If simulation mode is active, note it here.]
+
+Rules:
+- No Markdown syntax: no **, no ##, no *, no numbered lists with periods.
+- No decorative prose or filler.
+- Each section content must be short (2–4 lines maximum).
+- Do not repeat the MissionShield disclaimer inside the brief text.
+- Do not claim official NASA/NOAA status or issue go/no-go decisions.
+- If any value is SIMULATED, note that clearly under CONTEXT.
+- Derive all factor claims from the supplied risk report. Do not contradict it.
 """
 
 BRIEF_USER_TEMPLATE = """\

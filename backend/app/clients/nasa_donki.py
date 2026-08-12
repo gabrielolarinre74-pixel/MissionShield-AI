@@ -109,7 +109,7 @@ def _date_params(lookback_days: int) -> dict[str, str]:
     now = datetime.now(timezone.utc)
     start = (now - timedelta(days=lookback_days)).strftime("%Y-%m-%d")
     end = now.strftime("%Y-%m-%d")
-    return {"startDate": start, "endDate": end, "api_key": settings.NASA_API_KEY}
+    return {"startDate": start, "endDate": end}
 
 
 class NASADONKIClient:
@@ -264,7 +264,12 @@ class NASADONKIClient:
         url = f"{_BASE_URL}{path}"
         try:
             async with httpx.AsyncClient(timeout=self._timeout) as client:
-                response = await client.get(url, params=params)
+                response = await client.get(
+                    url,
+                    params=params,
+                    headers={"X-Api-Key": settings.NASA_API_KEY},
+                )
+
                 response.raise_for_status()
                 data = response.json()
                 # DONKI returns null for date ranges with no events.

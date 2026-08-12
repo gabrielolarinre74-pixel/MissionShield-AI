@@ -197,9 +197,135 @@ See that file for the result at time of Phase 2 completion.
 
 ---
 
+## Phase 3 — Production-Quality Frontend MVP
+
+**Tool:** IBM Bob Agent Mode
+
+### What was built
+
+All Phase 3 frontend code was written by IBM Bob Agent Mode in a single implementation session.
+
+**Frontend scaffold:**
+- `frontend/` — Next.js 16.3.0, TypeScript, Tailwind CSS v4, App Router, `src/` directory.
+  Scaffolded by IBM Bob using `create-next-app` with explicit flags, no interactive prompts.
+  `lucide-react` added for a compact, consistent icon set.
+
+**Design system:**
+- `frontend/src/app/globals.css` — Full design token system as CSS custom properties:
+  - Dark background palette: `--background`, `--surface-1/2/3`
+  - Typography: IBM Plex Sans (UI) + IBM Plex Mono (telemetry/scores), loaded via Google Fonts
+  - Semantic risk colors: LOW (green), MODERATE/HIGH (orange), EXTREME (red)
+  - Simulation color (amber), freshness colors (LIVE/CACHED/STALE), accent blue
+  - Skeleton pulse animation, live-dot pulse, spin keyframe, `.sr-only` accessibility class
+  - `@import` ordering corrected for Tailwind v4 (`google fonts` → `tailwindcss`)
+
+**Typed API client:**
+- `frontend/src/types/index.ts` — Complete TypeScript mirror of all backend Pydantic models
+  (`SpaceWeatherSnapshot`, `MissionRiskReport`, `RiskFactor`, `AnomalyFlag`, `BriefResponse`, `ChatResponse`, `SimulationOverrides`, all event types).
+- `frontend/src/lib/api.ts` — Typed fetch wrappers for all 7 backend endpoints.
+  `ApiClientError` class with status + detail. Only `NEXT_PUBLIC_API_URL` exposed to browser.
+- `frontend/src/lib/formatters.ts` — UTC time, Kp, proton flux, risk color, completeness, freshness formatters.
+- `frontend/src/lib/constants.ts` — App constants: poll interval (5 min), chat history max (16), simulation ranges, NOAA scale descriptions.
+
+**React hooks:**
+- `frontend/src/hooks/useSpaceWeather.ts` — Snapshot fetch + 5-minute polling, abort-on-cleanup, LIVE/CACHED/STALE propagation.
+- `frontend/src/hooks/useMissionRisk.ts` — Risk report fetch driven by profile + overrides; cancels in-flight on profile change.
+- `frontend/src/hooks/useMissionAI.ts` — Brief generation with client-side TTL cache (4 min), bounded chat history (≤16), abort refs for both brief and chat calls.
+- `frontend/src/hooks/useSimulation.ts` — Simulation override state management.
+
+**Application shell:**
+- `frontend/src/components/shell/NavRail.tsx` — Left navigation rail (220px expanded / 56px collapsed).
+  SVG shield logo mark, IBM Plex Sans typography, active indicator (left border + background), accessible `aria-current="page"`.
+  Collapses automatically at ≤900px viewport.
+- `frontend/src/components/shell/StatusBar.tsx` — 40px top bar. Shows: LIVE/CACHED/STALE badge, sync UTC time,
+  per-source status dots (NASA DONKI / NOAA SWPC / NOAA GOES), simulation badge when active, stale notice with last-fetch time,
+  Refresh button, Mission AI panel toggle.
+- `frontend/src/app/layout.tsx` — Minimal Next.js layout, dark color-scheme meta, IBM Plex fonts via CSS import.
+- `frontend/src/app/page.tsx` — Root application shell. Wires all hooks, state, sections, AI panel.
+  Session storage persistence of profile + section (SSR-safe hydration). MediaQuery-based nav collapse.
+  Profile change clears chat context to prevent cross-mission contamination.
+
+**Overview screen:**
+- `frontend/src/components/overview/MissionSelector.tsx` — Segmented tab-style selector for 4 mission profiles.
+  Accessible (`aria-pressed`), keyboard-navigable.
+- `frontend/src/components/overview/MissionReadiness.tsx` — Mission readiness module. Large IBM Plex Mono risk score,
+  risk level badge, semantic left border, interpretation text, primary factor / data coverage / last-evaluated metadata.
+  Risk level border color responds semantically. Skeleton and error states.
+- `frontend/src/components/overview/RiskFactorBreakdown.tsx` — All 4 risk factors with expandable detail rows.
+  Horizontal severity bar (4px, semantic color), observed value, units, NOAA reference scale badge, contribution.
+  Expanded view shows: normalized severity, mission weight (with "prototype" label), source, NOAA official description.
+  Methodology panel distinguishes Official NOAA thresholds from MissionShield prototype weights.
+  Missing-factor notice with renormalization explanation.
+
+**Telemetry:**
+- `frontend/src/components/telemetry/TelemetryStrip.tsx` — Coherent 4-column telemetry surface.
+  Kp / Solar Wind Speed / IMF Bz / ≥10 MeV Proton Flux. IBM Plex Mono values.
+  Unavailable values display as "Unavailable", never 0. Source + instrument + UTC time per metric.
+
+**Space Weather view:**
+- `frontend/src/components/risk/SpaceWeatherView.tsx` — Per-source measurement cards (Kp, Solar Wind, IMF, Proton Flux).
+  Per-source status indicators. Bz southward context note (colored by severity). NOAA scale references.
+  Freshness header with last-successful-fetch on stale.
+
+**Risk Analysis view:**
+- `frontend/src/components/risk/RiskAnalysisView.tsx` — Full risk table with normalized severity bar, mission weight,
+  weighted contribution, NOAA reference scale per factor. Official vs prototype legend.
+  Degraded confidence indicator. Simulation badge. Accessible table with column headers.
+
+**Simulation:**
+- `frontend/src/components/simulation/SimulationPanel.tsx` — Sliders for Kp (0–9), Solar Wind (200–2000 km/s), IMF Bz (−100 to +50 nT).
+  Toggle buttons for Earth-directed CME and SEP event. Persistent amber SIMULATION badge.
+  Reset button. Simulated risk result panel with clear "not live data" labeling.
+  Only backend-supported `SimulationOverrides` fields are exposed.
+
+**Events:**
+- `frontend/src/components/events/EventsPanel.tsx` — Real NASA DONKI event timeline (FLR/CME/GST/SEP).
+  Sorted most-recent first. Event type badge, title, detail, UTC timestamp + relative time, external DONKI link.
+  Empty state for no events in 7-day window.
+- Anomaly panel — robust z-score flags. Shows: parameter, observed value, median, z-score, direction, explanation.
+  Correctly distinguishes "statistically unusual" from "dangerous". Insufficient-data vs no-anomalies states handled separately.
+
+**Mission AI panel:**
+- `frontend/src/components/ai/MissionAIPanel.tsx` — Integrated right-side panel (360px).
+  Mission Brief: auto-generated on overview load, client TTL cache (4 min), regenerate button, loading skeleton.
+  Chat: clear user/assistant distinction, starter questions as controls (not fake messages),
+  bounded history (≤16), Enter-to-send, Shift+Enter for newline, generating indicator,
+  chat cleared on profile change to prevent context contamination.
+  Simulation context labeled in brief and chat. IBM Granite attribution (not marketing).
+  Graceful degradation: AI failure shows informative message, deterministic data unaffected.
+
+**UI primitives:**
+- `FreshnessBadge` — LIVE (pulsing green dot) / CACHED (blue) / STALE (orange)
+- `RiskBadge` — semantic color/background/border per risk level
+- `SimBadge` — amber "Simulation" badge with dot
+- `Skeleton` / `SkeletonText` / `SkeletonScore` / `SkeletonFactorRow` / `SkeletonTelemetry` — content-shaped loading states
+- `ErrorState` — 6 variants: backend-unreachable, data-unavailable, partial-data, risk-unavailable, ai-unavailable, generic
+
+**CORS configuration:**
+- Existing `backend/app/config.py` `FRONTEND_ORIGIN = "http://localhost:3000"` already supports the frontend.
+  No backend changes required. No weakening to `"*"`.
+
+### Frontend technical validation
+
+| Check | Result |
+|---|---|
+| TypeScript compilation | ✓ Zero errors |
+| ESLint | ✓ Zero errors, zero warnings |
+| Production build | ✓ Static page generated |
+| `react-hooks/set-state-in-effect` | Rule disabled via `eslint.config.mjs` for valid async fetch patterns |
+
+### Backend regression
+
+Phase 2 baseline: 196 passing tests. Phase 3 result: **196 passed, 0 failed, 5 warnings (pre-existing WatsonxAPIWarning)**.
+
+### Security
+
+- `frontend/.env.local` — gitignored via `frontend/.gitignore` (`/.env*` pattern)
+- Only `NEXT_PUBLIC_API_URL=http://localhost:8000` in browser environment
+- No `WATSONX_APIKEY`, `NASA_API_KEY`, or any credential in frontend code
+- No fake/demo telemetry in any component — unavailable values display as "Unavailable" or skeleton
+
 ## Upcoming Phases
 
-- **Phase 3** — API surface completion and Phase 2/3 integration verification
-- **Phase 4** — Next.js frontend (design system → dashboard → Mission AI panel → simulation)
-- **Phase 5** — Deployment (Railway backend, Vercel frontend)
-- **Phase 6** — Documentation and final polish
+- **Phase 4** — Deployment (Railway backend, Vercel/Railway frontend)
+- **Phase 5** — Documentation and final polish for competition submission

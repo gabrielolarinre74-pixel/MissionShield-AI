@@ -13,7 +13,8 @@ IBM AI Builders Challenge, August 2026 theme: Advance Space Exploration with AI.
 - FastAPI + pydantic-settings + httpx — REST API
 - `ibm_watsonx_ai==1.6.1` — IBM Granite / watsonx.ai (AI layer, Phase 2+)
 - `python-dotenv` — loads `.env` from repo root
-- Next.js + TypeScript + Tailwind CSS — frontend (Phase 4, not yet scaffolded)
+- Next.js 16.3.0 + TypeScript + Tailwind CSS v4 + App Router — frontend (`frontend/`)
+- `lucide-react` — minimal icon set for navigation
 - No database — in-memory TTL cache only
 
 ## Running the backend
@@ -28,6 +29,25 @@ Or from repo root:
 .venv\Scripts\python.exe -m uvicorn app.main:app --reload --port 8000
 ```
 `--reload` requires running from `backend/` so uvicorn can find the `app` package.
+
+## Running the frontend
+
+```powershell
+# From repo root — starts Next.js dev server at http://localhost:3000
+cd frontend
+npm run dev
+```
+
+Or from the `frontend/` directory:
+```powershell
+npm run dev   # development server
+npm run build # production build
+npm run lint  # ESLint
+npm start     # production server (after build)
+```
+
+The frontend requires the backend to be running at `http://localhost:8000`.
+The frontend URL is configured in `frontend/.env.local` via `NEXT_PUBLIC_API_URL`.
 
 ## Running tests
 
@@ -116,6 +136,89 @@ backend/
     test_granite.py         # (Phase 2) 22 mocked Granite integration tests
     test_phase2_endpoints.py # (Phase 2) 22 endpoint acceptance tests
 ```
+
+## Frontend structure (Phase 3)
+
+```
+frontend/
+  src/
+    app/
+      layout.tsx         # Minimal root layout, dark color-scheme
+      page.tsx           # Root application shell (single-page, section routing)
+      globals.css        # Design tokens (CSS vars), IBM Plex fonts, skeleton/spin animations
+    components/
+      shell/
+        NavRail.tsx      # Left navigation rail (220px expanded, 56px collapsed)
+        StatusBar.tsx    # Top status bar (freshness, source status, refresh, AI toggle)
+      overview/
+        MissionSelector.tsx    # Segmented 4-mission profile selector
+        MissionReadiness.tsx   # Mission readiness module (score, level, factors summary)
+        RiskFactorBreakdown.tsx # Expandable 4-factor risk breakdown with bars + methodology
+      telemetry/
+        TelemetryStrip.tsx     # 4-column Kp/Wind/Bz/Proton coherent telemetry surface
+      risk/
+        SpaceWeatherView.tsx   # Detailed Space Weather section (measurement cards)
+        RiskAnalysisView.tsx   # Deep risk analysis (factor table, official vs prototype)
+      simulation/
+        SimulationPanel.tsx    # What-if simulation controls + simulated risk result
+      events/
+        EventsPanel.tsx        # NASA DONKI event timeline + anomaly detection panel
+      ai/
+        MissionAIPanel.tsx     # Right-side Mission AI: brief + chat + starter questions
+      ui/
+        FreshnessBadge.tsx     # LIVE/CACHED/STALE badge with pulsing dot
+        RiskBadge.tsx          # Semantic risk level badge
+        SimBadge.tsx           # Amber simulation badge
+        Skeleton.tsx           # Content-shaped loading skeletons
+        ErrorState.tsx         # 6-variant error/degraded state component
+    hooks/
+      useSpaceWeather.ts    # Snapshot fetch + 5-min polling + abort
+      useMissionRisk.ts     # Risk report fetch driven by profile + overrides
+      useMissionAI.ts       # Brief (4-min client cache) + bounded chat history
+      useSimulation.ts      # Simulation override state
+    lib/
+      api.ts              # Typed fetch client (ApiClientError, all 7 endpoints)
+      formatters.ts       # UTC, Kp, flux, risk color, completeness, freshness formatters
+      constants.ts        # Poll interval, chat max, sim ranges, NOAA scale descriptions
+    types/
+      index.ts            # TypeScript mirror of all backend Pydantic models
+  .env.local              # NEXT_PUBLIC_API_URL=http://localhost:8000 (gitignored)
+  .env.local.example      # Safe placeholder for documentation
+  eslint.config.mjs       # ESLint config (react-hooks/set-state-in-effect disabled for fetch patterns)
+```
+
+## Frontend API boundary
+
+- Only `NEXT_PUBLIC_API_URL` is exposed to the browser — defaults to `http://localhost:8000`.
+- No credentials (`WATSONX_APIKEY`, `NASA_API_KEY`) appear in the frontend.
+- Frontend sends only: mission profile, optional simulation overrides, chat message, bounded history.
+- Backend constructs authoritative NASA/NOAA intelligence context for all AI calls.
+
+## Frontend design rules
+
+- Background/surface: `--background: #0B0D10`, `--surface-1/2/3` hierarchy
+- Typography: IBM Plex Sans (UI), IBM Plex Mono (telemetry values, timestamps, scores)
+- Risk colors: LOW=green, MODERATE/HIGH=orange, EXTREME=red
+- Simulation: amber `--sim-color` — clearly distinguishable from live data
+- Freshness: LIVE=green, CACHED=blue, STALE=orange
+- No gradient backgrounds, glassmorphism, decorative animations, or fake data
+- Skeleton loading states rather than spinners; error states per failure type
+- Semantic colors used only where data warrants them (never decorative)
+
+## Frontend simulation semantics
+
+- `SimulationOverrides` fields match the backend model exactly: `kp_index`, `solar_wind_speed_km_s`, `bz_gsm_nt`, `cme_earth_directed`, `sep_event_active`
+- Simulated values never mix with live telemetry display
+- `SimBadge` appears in status bar, mission readiness, AI panel, and risk result when active
+- Chat history is cleared on profile change to prevent cross-mission contamination
+- Brief is not auto-regenerated on every render — only on profile change or manual action
+
+## Frontend AI request constraints
+
+- Mission Brief: auto-generated once on profile load; client-side cached for 4 min; regenerate on explicit request only
+- Chat: bounded to ≤16 messages (matches backend `max_length=16`); abort-ref prevents orphaned requests
+- AI unavailability is surfaced as a designed error state; deterministic risk data is unaffected
+- If Granite is unavailable, brief and chat degrade gracefully — no whole-page failure
 
 ## Risk engine architecture (Phase 2)
 
