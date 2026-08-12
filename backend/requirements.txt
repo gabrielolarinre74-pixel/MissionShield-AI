@@ -4,6 +4,8 @@ pydantic>=2.0
 pydantic-settings>=2.0
 python-dotenv>=1.0
 httpx>=0.28
+# IBM watsonx.ai SDK — exact pin of the locally tested, known-working version.
+ibm_watsonx_ai==1.6.1
 pytest>=8.0
 pytest-asyncio>=0.25
 anyio>=4.0

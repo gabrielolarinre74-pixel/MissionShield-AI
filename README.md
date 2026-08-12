@@ -231,13 +231,17 @@ WATSONX_APIKEY=your_watsonx_api_key
 WATSONX_URL=https://us-south.ml.cloud.ibm.com
 WATSONX_PROJECT_ID=your_project_id
 WATSONX_MODEL_ID=your_granite_model_id
+FRONTEND_ORIGIN=http://localhost:3000
 ```
+
+Optional variables (with defaults): `CACHE_TTL_SECONDS=300`,
+`EXTERNAL_API_TIMEOUT_SECONDS=10`. `FRONTEND_ORIGIN` should be set to the deployed
+frontend origin in production.
 
 2. Install dependencies:
 
 ```bash
 pip install -r backend/requirements.txt
-pip install ibm_watsonx_ai==1.6.1   # required for the AI layer
 ```
 
 3. Start the API:
