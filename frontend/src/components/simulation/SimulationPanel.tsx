@@ -142,7 +142,7 @@ export function SimulationPanel({
               What-If Simulation
             </p>
             <p style={{ fontSize: 12, color: 'var(--text-muted)', lineHeight: 1.4 }}>
-              Override live values to explore hypothetical scenarios. Simulated values are never 
+              Override live values to explore hypothetical scenarios. Simulated values are never
               mistaken for live NASA/NOAA data.
             </p>
           </div>
