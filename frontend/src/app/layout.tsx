@@ -23,6 +23,9 @@ export const metadata: Metadata = {
   title: 'MissionShield AI — Space Mission Decision Support',
   description:
     'AI-powered space mission decision-support platform. Real NASA/NOAA space-weather data, deterministic mission risk analysis, and IBM Granite mission intelligence.',
+  icons: {
+    icon: '/icon.png',
+  },
 };
 
 // Runs before first paint to set the persisted (or OS-preferred) theme and
